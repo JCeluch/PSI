@@ -1,44 +1,54 @@
-'silnia(0,1).
-silnia(N,Nsil) :-
-	N>0,
-	M is N-1,
-	silnia(M,Msil),
-	Nsil is N*Msil.
+%opis grafu
+dungeon(entryroom, dormitory, 5).
+dungeon(entryroom, armory, 2).
+dungeon(dormitory, kitchen, 1).
+dungeon(dormitory, shrine, 6).
+dungeon(dormitory, jail, 3).
+dungeon(dormitory, armory, 5).
+dungeon(dormitory, guardpost, 4).
+dungeon(kitchen, chapel, 3).
+dungeon(chapel, bath, 1).
+dungeon(shrine, jail, 2).
+dungeon(bath, laboratory, 6).
+dungeon(jail, guardpost, 5).
+dungeon(courthall, masterbedroom, 4).
+dungeon(courthall, forge, 4).
+dungeon(armory, courthall, 3).
+dungeon(laboratory, latrines, 2).
+dungeon(laboratory, eatinghall, 2).
+dungeon(masterbedroom, observatory, 1).
+dungeon(forge, garden, 7).
+dungeon(forge, eatinghall, 3).
+dungeon(forge, guardpost, 4).
+dungeon(eatinghall, nursery, 2).
+dungeon(eatinghall, guardpost, 6).
+dungeon(latrines, nursery, 3).
+dungeon(observatory, garden, 3).
+dungeon(nursery, exitroom, 4).
+dungeon(garden, barracks, 7).
+dungeon(barracks, eatinghall, 1).
 
-fib(0,0).
-fib(1,1).
-fib(N,Nfib) :-
-	N>1,
-	A is N-1,
-	fib(A,Afib),
-	B is N-2,
-	fib(B,Bfib),
-	Nfib is Afib + Bfib.
+% graf nieskierowany
+neighborroom(X, Y, C) :- dungeon(X, Y, C).
+neighborroom(X, Y, C) :- dungeon(Y, X, C).
 
-%bramka and	
-brAnd(0,0,0).
-brAnd(1,0,0).
-brAnd(0,1,0).
-brAnd(1,1,1).
+run(X,Y) :-
+        go(X, Y, [X], 0).
 
-%bramka or	
-brOr(0,0,0).
-brOr(1,0,1).
-brOr(0,1,1).
-brOr(1,1,1).
+go(X, X, T, C) :-
+        write(T), nl,
+        write("Cost: "), write(C), nl.
 
-%bramka not	
-brNot(0,1).
-brNot(1,0).
+%lista węzłów zakazanych
+%avoid([jail,latrines,bath]).
 
-uklad(A,B,C,D,E,F,G) :-
-	brAnd(A,B,E),
-	brAnd(C,D,F),
-	brAnd(E,F,G).
-	
-u(A,B,C,D,E,F,G,H,I,J) :-
-	brOr(A,B,F),
-	brAnd(C,D,G),
-	brOr(F,G,H),
-	brNot(H,I),
-	brOr(I,E,J).
+%poszukiwanie drogi
+go(X,Y,T,Cost) :-
+        neighborroom(X, Z, C),
+        \+ member(Z, T),
+        Sum is Cost + C,
+        go(Z, Y, [Z|T], Sum).
+
+%sprawdzenie, czy element występuje w liście
+member(X,[X|_]).
+member(X,[_|H]) :- member(X,H).
